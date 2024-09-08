@@ -24,7 +24,9 @@
 #include "reEsp32.h"
 #include "reNvs.h"
 #include "reEvents.h"
+#ifndef CONFIG_MQTT1_OFF
 #include "reMqtt.h"
+#endif 
 #if CONFIG_MQTT_OTA_ENABLE
 #include "reOTA.h"
 #endif // CONFIG_MQTT_OTA_ENABLE
