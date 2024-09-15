@@ -1,6 +1,6 @@
 {
   "name": "reParams",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Library for storing and managing parameters ESP32 (ESP-IDF)",
   "keywords": "esp32",
   "authors":
@@ -9,6 +9,11 @@
       "name": "Alexander Razzhivin",
       "email": "kotyara12@yandex.ru",
       "url": "https://kotyara12.ru"
+    },
+    {
+      "name": "Vasily K",
+      "email": "vasily9k@gmail.com",
+      "url": "https://github.com/vasily9k"
     }
   ],
   "license": "MIT",
