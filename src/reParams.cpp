@@ -87,7 +87,9 @@ void paramsFree()
     STAILQ_FOREACH_SAFE(itemL, paramsList, next, tmpL) {
       STAILQ_REMOVE(paramsList, itemL, paramsEntry_t, next);
       if ((itemL->topic_subscribe) && itemL->subscribed) {
+        #ifndef CONFIG_MQTT1_OFF
         mqttUnsubscribe(itemL->topic_subscribe);
+        #endif 
         free(itemL->topic_subscribe);
       };
       #if CONFIG_MQTT_PARAMS_CONFIRM_ENABLED
@@ -119,6 +121,7 @@ void paramsFree()
   vSemaphoreDelete(paramsLock);
 }
 
+#ifndef CONFIG_MQTT1_OFF
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- MQTT topics ------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
@@ -471,6 +474,7 @@ void paramsMqttUnubscribe(paramsEntryHandle_t entry)
     _paramsMqttUnubscribe(entry);
   };
 }
+#endif // CONFIG_MQTT1_OFF
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------- Register parameters -------------------------------------------------
@@ -627,8 +631,10 @@ paramsEntryHandle_t paramsRegisterValueEx(const param_kind_t type_param, const p
           free(str_value);
         };
       };
+      #ifndef CONFIG_MQTT1_OFF
       // We try to subscribe if the connection to the server is already established
       paramsMqttSubscribe(item);
+      #endif // CONFIG_MQTT_PARAMS_WILDCARD  
     };
   };
   
@@ -799,6 +805,7 @@ void paramsSetLimitsDouble(paramsEntryHandle_t entry, double min_value, double m
   };
 }
 
+#ifndef CONFIG_MQTT1_OFF
 // -----------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------- OTA ---------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
@@ -903,6 +910,7 @@ void paramsProcessSignal(paramsEntryHandle_t item, char *payload)
     };
   };
 }
+#endif // CONFIG_MQTT1_OFF
 
 // -----------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------- Store new value ---------------------------------------------------
@@ -963,7 +971,9 @@ void paramsValueStore(paramsEntryHandle_t entry, const bool callHandler)
         };
       };
       // Publish the current value
+      #ifndef CONFIG_MQTT1_OFF
       paramsMqttPublish(entry, true);
+      #endif // CONFIG_MQTT1_OFF
       // Send notification
       if (entry->notify && ((entry->type_param == OPT_KIND_PARAMETER) 
                          || (entry->type_param == OPT_KIND_PARAMETER_ONLINE) 
@@ -1001,7 +1011,9 @@ void _paramsValueSet(paramsEntryHandle_t entry, char *value, bool publish_in_mqt
         eventLoopPost(RE_PARAMS_EVENTS, RE_PARAMS_EQUALS, &entry->id, sizeof(entry->id), portMAX_DELAY);
       };
       // Publish value
+      #ifndef CONFIG_MQTT1_OFF
       paramsMqttPublish(entry, publish_in_mqtt);
+      #endif // CONFIG_MQTT1_OFF
       // Send notification
       if (entry->notify && ((entry->type_param == OPT_KIND_PARAMETER) || (entry->type_param == OPT_KIND_PARAMETER_ONLINE))) {
         // Send notification to telegram
@@ -1042,7 +1054,9 @@ void _paramsValueSet(paramsEntryHandle_t entry, char *value, bool publish_in_mqt
           };
         };
         // Only for parameters...
+        #ifndef CONFIG_MQTT1_OFF
         paramsMqttPublish(entry, publish_in_mqtt);
+        #endif // CONFIG_MQTT1_OFF
         // Send notification
         if (entry->notify && ((entry->type_param == OPT_KIND_PARAMETER) 
                            || (entry->type_param == OPT_KIND_PARAMETER_ONLINE) 
@@ -1056,7 +1070,9 @@ void _paramsValueSet(paramsEntryHandle_t entry, char *value, bool publish_in_mqt
       } else {
         rlog_w(logTAG, "Received value [ %s ] is out of range, ignored!", value);
         // Only for parameters...
+        #ifndef CONFIG_MQTT1_OFF
         paramsMqttPublish(entry, publish_in_mqtt);
+        #endif // CONFIG_MQTT1_OFF
         // Send notification
         if (entry->notify && ((entry->type_param == OPT_KIND_PARAMETER) 
                            || (entry->type_param == OPT_KIND_PARAMETER_ONLINE) 
@@ -1103,6 +1119,7 @@ void paramsValueSet(paramsEntryHandle_t entry, char *new_value, bool publish_in_
   OPTIONS_UNLOCK();
 }
 
+#ifndef CONFIG_MQTT1_OFF
 // -----------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------ MQTT public functions ------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
@@ -1318,4 +1335,5 @@ bool paramsEventHandlerRegister()
 {
   return eventHandlerRegister(RE_MQTT_EVENTS, ESP_EVENT_ANY_ID, &paramsMqttEventHandler, nullptr);
 }
+#endif // CONFIG_MQTT1_OFF
 

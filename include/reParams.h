@@ -121,12 +121,13 @@ void paramsSetLimitsU64(paramsEntryHandle_t entry, uint64_t min_value, uint64_t 
 void paramsSetLimitsFloat(paramsEntryHandle_t entry, float min_value, float max_value);
 void paramsSetLimitsDouble(paramsEntryHandle_t entry, double min_value, double max_value);
 
+void paramsValueStore(paramsEntryHandle_t entry, const bool callHandler);
+void paramsValueSet(paramsEntryHandle_t entry, char *new_value, bool publish_in_mqtt);
+
+#ifndef CONFIG_MQTT1_OFF
 void paramsMqttSubscribe(paramsEntryHandle_t entry);
 void paramsMqttUnsubscribe(paramsEntryHandle_t entry);
 void paramsMqttPublish(paramsEntryHandle_t entry, bool publish_in_mqtt);
-
-void paramsValueStore(paramsEntryHandle_t entry, const bool callHandler);
-void paramsValueSet(paramsEntryHandle_t entry, char *new_value, bool publish_in_mqtt);
 
 // Functions for working with the MQTT broker directly
 // Note: usually they are not needed, they will be called automatically when the corresponding event is received
@@ -136,6 +137,7 @@ void paramsMqttIncomingMessage(char *topic, char *payload, size_t len);
 
 // Register event handlers
 bool paramsEventHandlerRegister();
+#endif // CONFIG_MQTT1_OFF
 
 #ifdef __cplusplus
 }
